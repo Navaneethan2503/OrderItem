@@ -8,14 +8,18 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OrderItem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         [HttpPost("{Id}")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> index(int Id)
         {
             Cart order1 = new Cart();
@@ -31,6 +35,10 @@ namespace OrderItem.Controllers
                 {
                     string json = await httpResponseMessage.Content.ReadAsStringAsync();
                     item = JsonConvert.DeserializeObject<MenuItem>(json);
+                }
+                else if(httpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return NotFound(); 
                 }
                 order1.Id = 1;
                 order1.UserId = 1;
